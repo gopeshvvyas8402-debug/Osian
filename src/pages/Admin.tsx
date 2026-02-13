@@ -1259,77 +1259,97 @@ export function Admin() {
                   <p className="text-gray-600">Manage the gallery images displayed on the Gallery page.</p>
                 </div>
 
-                <div className="space-y-4">
+                {/* Add Multiple Images Button */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                  <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => {
+                          const fileInput = document.createElement('input');
+                          fileInput.type = 'file';
+                          fileInput.accept = 'image/*';
+                          fileInput.multiple = true;
+                          fileInput.onchange = (e: Event) => {
+                            const target = e.target as HTMLInputElement;
+                            const files = Array.from(target.files || []) as File[];
+                            const newGallery = [...content.gallery];
+                            let id = newGallery.length > 0 ? Math.max(...newGallery.map(img => img.id)) + 1 : 1;
+                            
+                            files.forEach(file => {
+                              const reader = new FileReader();
+                              reader.onload = (event) => {
+                                const imageUrl = event.target?.result as string;
+                                newGallery.push({
+                                  id,
+                                  category: 'All',
+                                  title: file.name.split('.')[0],
+                                  desc: '',
+                                  gradient: 'from-blue-400 to-blue-600',
+                                  icon: 'Camera',
+                                  imageUrl
+                                });
+                                id++;
+                                updateContent({ gallery: newGallery });
+                              };
+                              reader.readAsDataURL(file);
+                            });
+                          };
+                          fileInput.click();
+                        }}
+                        className="flex items-center gap-2 bg-gradient-to-br from-primary to-accent text-white px-6 py-3 rounded-lg font-medium hover:shadow-md transition-all"
+                      >
+                        <Plus className="h-4 w-4" />
+                        Upload Multiple Images
+                      </button>
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      Total Images: <span className="font-semibold text-gray-900">{content.gallery.length}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Gallery Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {content.gallery.map((image, index) => (
-                    <div key={index} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
+                    <div key={index} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4 hover:shadow-md transition-shadow">
                       <div className="flex items-center justify-between">
                         <h3 className="text-lg font-semibold text-gray-900">Image {index + 1}</h3>
+                        <button
+                          onClick={() => {
+                            if (window.confirm('Are you sure you want to delete this image?')) {
+                              const newGallery = content.gallery.filter((_, i) => i !== index);
+                              updateContent({ gallery: newGallery });
+                            }
+                          }}
+                          className="text-red-600 hover:text-red-800 transition-colors"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
                       </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                          <input
-                            type="text"
-                            value={image.category}
-                            onChange={(e) => {
-                              const newGallery = [...content.gallery];
-                              newGallery[index] = { ...image, category: e.target.value };
-                              updateContent({ gallery: newGallery });
-                            }}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                            placeholder="Enter category"
-                          />
+                      <div className="space-y-4">
+                        {/* Image Preview */}
+                        <div className="relative">
+                          {image.imageUrl ? (
+                            <div className="border border-gray-200 rounded-lg overflow-hidden">
+                              <img
+                                src={image.imageUrl}
+                                alt={image.title}
+                                className="w-full h-32 object-cover"
+                              />
+                            </div>
+                          ) : (
+                            <div className={`h-32 bg-gradient-to-br ${image.gradient} rounded-lg flex items-center justify-center`}>
+                              {(() => {
+                                const IconComponent = iconMap[image.icon as keyof typeof iconMap] || Monitor;
+                                return <IconComponent className="h-10 w-10 text-white/80" />;
+                              })()}
+                            </div>
+                          )}
                         </div>
+
+                        {/* Image Upload */}
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
-                          <input
-                            type="text"
-                            value={image.title}
-                            onChange={(e) => {
-                              const newGallery = [...content.gallery];
-                              newGallery[index] = { ...image, title: e.target.value };
-                              updateContent({ gallery: newGallery });
-                            }}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                            placeholder="Enter title"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Icon</label>
-                          <select
-                            value={image.icon}
-                            onChange={(e) => {
-                              const newGallery = [...content.gallery];
-                              newGallery[index] = { ...image, icon: e.target.value };
-                              updateContent({ gallery: newGallery });
-                            }}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                          >
-                            {iconOptions.map(icon => (
-                              <option key={icon} value={icon}>{icon}</option>
-                            ))}
-                          </select>
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Gradient</label>
-                          <select
-                            value={image.gradient}
-                            onChange={(e) => {
-                              const newGallery = [...content.gallery];
-                              newGallery[index] = { ...image, gradient: e.target.value };
-                              updateContent({ gallery: newGallery });
-                            }}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                          >
-                            {colorOptions.map(color => (
-                              <option key={color} value={color}>{color}</option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Image</label>
-                        <div className="space-y-2">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Image</label>
                           <div className="flex gap-2">
                             <input
                               type="url"
@@ -1340,7 +1360,7 @@ export function Admin() {
                                 updateContent({ gallery: newGallery });
                               }}
                               className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                              placeholder="Enter image URL (e.g., /images/gallery/image1.jpg)"
+                              placeholder="Enter image URL"
                             />
                             <label className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark cursor-pointer transition-colors">
                               <Upload className="h-4 w-4" />
@@ -1365,33 +1385,91 @@ export function Admin() {
                               />
                             </label>
                           </div>
-                          {image.imageUrl && (
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">Preview</label>
-                              <div className="border border-gray-200 rounded-lg overflow-hidden max-w-xs">
-                                <img
-                                  src={image.imageUrl}
-                                  alt={image.title}
-                                  className="w-full h-40 object-cover"
-                                />
-                              </div>
-                            </div>
-                          )}
                         </div>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                        <textarea
-                          value={image.desc}
-                          onChange={(e) => {
-                            const newGallery = [...content.gallery];
-                            newGallery[index] = { ...image, desc: e.target.value };
-                            updateContent({ gallery: newGallery });
-                          }}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                          placeholder="Enter description"
-                          rows={2}
-                        />
+
+                        {/* Category */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                          <input
+                            type="text"
+                            value={image.category}
+                            onChange={(e) => {
+                              const newGallery = [...content.gallery];
+                              newGallery[index] = { ...image, category: e.target.value };
+                              updateContent({ gallery: newGallery });
+                            }}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                            placeholder="Enter category"
+                          />
+                        </div>
+
+                        {/* Title */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                          <input
+                            type="text"
+                            value={image.title}
+                            onChange={(e) => {
+                              const newGallery = [...content.gallery];
+                              newGallery[index] = { ...image, title: e.target.value };
+                              updateContent({ gallery: newGallery });
+                            }}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                            placeholder="Enter title"
+                          />
+                        </div>
+
+                        {/* Description */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                          <textarea
+                            value={image.desc}
+                            onChange={(e) => {
+                              const newGallery = [...content.gallery];
+                              newGallery[index] = { ...image, desc: e.target.value };
+                              updateContent({ gallery: newGallery });
+                            }}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                            placeholder="Enter description"
+                            rows={2}
+                          />
+                        </div>
+
+                        {/* Icon and Gradient */}
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Icon</label>
+                            <select
+                              value={image.icon}
+                              onChange={(e) => {
+                                const newGallery = [...content.gallery];
+                                newGallery[index] = { ...image, icon: e.target.value };
+                                updateContent({ gallery: newGallery });
+                              }}
+                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                            >
+                              {iconOptions.map(icon => (
+                                <option key={icon} value={icon}>{icon}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Gradient</label>
+                            <select
+                              value={image.gradient}
+                              onChange={(e) => {
+                                const newGallery = [...content.gallery];
+                                newGallery[index] = { ...image, gradient: e.target.value };
+                                updateContent({ gallery: newGallery });
+                              }}
+                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                            >
+                              {colorOptions.map(color => (
+                                <option key={color} value={color}>{color}</option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   ))}
