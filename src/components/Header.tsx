@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Phone, Mail, Clock, MapPin, Lock, Moon, Sun } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
+import { useSiteContext } from "../context/SiteContext";
 
 const navLinks = [
   { label: "Home", path: "/" },
@@ -15,6 +16,7 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const { isDark, toggleTheme } = useTheme();
+  const { content } = useSiteContext();
 
   return (
     <header className="sticky top-0 z-50 w-full shadow-lg">
@@ -23,18 +25,18 @@ export function Header() {
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between px-4 py-2 text-xs sm:text-sm">
           <div className="flex items-center gap-4 flex-wrap">
             <span className="flex items-center gap-1">
-              <Phone className="h-3 w-3" /> +91 9409758100
+              <Phone className="h-3 w-3" /> {content.contactInfo.phone}
             </span>
             <span className="hidden sm:flex items-center gap-1">
-              <Mail className="h-3 w-3" /> info@osian.tech
+              <Mail className="h-3 w-3" /> {content.contactInfo.email}
             </span>
           </div>
           <div className="flex items-center gap-4">
             <span className="hidden md:flex items-center gap-1">
-              <Clock className="h-3 w-3" /> Mon-Sat: 8:00 AM - 8:00 PM
+              <Clock className="h-3 w-3" /> {content.contactInfo.timings}
             </span>
             <span className="hidden lg:flex items-center gap-1">
-              <MapPin className="h-3 w-3" /> Vadodara, Gujarat
+              <MapPin className="h-3 w-3" /> {content.contactInfo.address}
             </span>
           </div>
         </div>
@@ -47,8 +49,8 @@ export function Header() {
           <Link to="/" className="flex items-center gap-3">
             <div className="h-12 w-12 rounded-xl overflow-hidden shadow-md">
               <img 
-                src="/logo.jpg" 
-                alt="Osian Enterprise Logo" 
+                src={content.siteInfo.logo} 
+                alt={`${content.siteInfo.siteName} Logo`} 
                 className="h-full w-full object-cover"
               />
             </div>
@@ -56,12 +58,12 @@ export function Header() {
               <h1 className={`text-lg font-bold leading-tight ${
                 isDark ? 'text-primary-light' : 'text-primary-dark'
               }`}>
-                Osian Enterprise
+                {content.siteInfo.siteName}
               </h1>
               <p className={`text-[10px] font-medium tracking-wider uppercase ${
                 isDark ? 'text-text-muted' : 'text-gray-500'
               }`}>
-                IT & Computer Academy
+                {content.siteInfo.tagline}
               </p>
             </div>
           </Link>

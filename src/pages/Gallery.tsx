@@ -1,41 +1,25 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { X, ZoomIn, Monitor, Users, Award, GraduationCap, Camera, PartyPopper } from "lucide-react";
+import { useSiteContext } from "../context/SiteContext";
 
 const categories = ["All", "Classroom", "Lab", "Events", "Achievements", "Students"];
 
-interface GalleryImage {
-  id: number;
-  category: string;
-  title: string;
-  desc: string;
-  gradient: string;
-  icon: React.ElementType;
-}
-
-const galleryImages: GalleryImage[] = [
-  { id: 1, category: "Classroom", title: "Modern Classroom", desc: "Our spacious and well-equipped classrooms for interactive learning.", gradient: "from-blue-400 to-blue-600", icon: Monitor },
-  { id: 2, category: "Lab", title: "Computer Lab", desc: "State-of-the-art computer lab with latest hardware.", gradient: "from-green-400 to-green-600", icon: Monitor },
-  { id: 3, category: "Events", title: "Annual Day Celebration", desc: "Students performing at our annual day function.", gradient: "from-purple-400 to-purple-600", icon: PartyPopper },
-  { id: 4, category: "Achievements", title: "Award Ceremony", desc: "Students receiving certificates and awards.", gradient: "from-yellow-400 to-yellow-600", icon: Award },
-  { id: 5, category: "Students", title: "Web Development Batch", desc: "Our web development batch of 2024.", gradient: "from-cyan-400 to-cyan-600", icon: Users },
-  { id: 6, category: "Classroom", title: "Interactive Session", desc: "Faculty conducting an interactive training session.", gradient: "from-pink-400 to-pink-600", icon: GraduationCap },
-  { id: 7, category: "Lab", title: "Design Lab", desc: "Graphic design lab with high-performance workstations.", gradient: "from-orange-400 to-orange-600", icon: Monitor },
-  { id: 8, category: "Events", title: "Workshop on Python", desc: "Special workshop on Python programming.", gradient: "from-teal-400 to-teal-600", icon: PartyPopper },
-  { id: 9, category: "Students", title: "Tally Batch 2024", desc: "Our Tally Prime with GST batch students.", gradient: "from-indigo-400 to-indigo-600", icon: Users },
-  { id: 10, category: "Achievements", title: "Placement Drive", desc: "Students getting placed through our placement cell.", gradient: "from-rose-400 to-rose-600", icon: Award },
-  { id: 11, category: "Events", title: "Guest Lecture", desc: "Industry expert delivering a guest lecture to students.", gradient: "from-emerald-400 to-emerald-600", icon: PartyPopper },
-  { id: 12, category: "Classroom", title: "Seminar Hall", desc: "Our seminar hall for guest lectures and events.", gradient: "from-violet-400 to-violet-600", icon: GraduationCap },
-  { id: 13, category: "Lab", title: "Networking Lab", desc: "Dedicated lab for networking and hardware training.", gradient: "from-sky-400 to-sky-600", icon: Monitor },
-  { id: 14, category: "Students", title: "DCA Batch 2024", desc: "Our DCA batch completing their course successfully.", gradient: "from-amber-400 to-amber-600", icon: Users },
-  { id: 15, category: "Achievements", title: "Best Institute Award", desc: "Recognized as the best computer training institute.", gradient: "from-lime-500 to-lime-700", icon: Award },
-];
+const iconMap = {
+  Monitor,
+  Users,
+  Award,
+  GraduationCap,
+  Camera,
+  PartyPopper
+};
 
 export function Gallery() {
   const [activeCategory, setActiveCategory] = useState("All");
-  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
+  const [selectedImage, setSelectedImage] = useState<any | null>(null);
+  const { content } = useSiteContext();
 
-  const filtered = activeCategory === "All" ? galleryImages : galleryImages.filter(img => img.category === activeCategory);
+  const filtered = activeCategory === "All" ? content.gallery : content.gallery.filter(img => img.category === activeCategory);
 
   return (
     <div>
@@ -87,34 +71,61 @@ export function Gallery() {
 
           {/* Gallery Grid */}
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((img) => (
-              <div
-                key={img.id}
-                onClick={() => setSelectedImage(img)}
-                className="group cursor-pointer rounded-2xl overflow-hidden shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
-              >
-                {/* Image placeholder with gradient */}
-                <div className={`relative h-56 bg-gradient-to-br ${img.gradient} flex items-center justify-center overflow-hidden`}>
-                  <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.2) 1px, transparent 1px)", backgroundSize: "15px 15px" }}></div>
-                  <div className="relative text-center">
-                    <img.icon className="mx-auto h-16 w-16 text-white/80 mb-2 transition-transform group-hover:scale-110" />
-                    <p className="text-white/70 text-sm font-medium">{img.category}</p>
-                  </div>
-                  {/* Overlay */}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center">
-                    <div className="opacity-0 group-hover:opacity-100 transition-all">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm text-white">
-                        <ZoomIn className="h-6 w-6" />
+            {filtered.map((img) => {
+              const IconComponent = iconMap[img.icon as keyof typeof iconMap] || Monitor;
+              return (
+                <div
+                  key={img.id}
+                  onClick={() => setSelectedImage(img)}
+                  className="group cursor-pointer rounded-2xl overflow-hidden shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+                >
+                  {/* Image placeholder with gradient or actual image */}
+                  <div className="relative h-56 overflow-hidden">
+                    {img.imageUrl ? (
+                      <>
+                        <img
+                          src={img.imageUrl}
+                          alt={img.title}
+                          className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center">
+                          <div className="opacity-0 group-hover:opacity-100 transition-all">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm text-white">
+                              <ZoomIn className="h-6 w-6" />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="absolute bottom-2 left-2">
+                          <span className="inline-block bg-black/70 text-white px-2 py-1 rounded text-xs font-medium">
+                            {img.category}
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <div className={`relative h-full bg-gradient-to-br ${img.gradient} flex items-center justify-center overflow-hidden`}>
+                        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.2) 1px, transparent 1px)", backgroundSize: "15px 15px" }}></div>
+                        <div className="relative text-center">
+                          <IconComponent className="mx-auto h-16 w-16 text-white/80 mb-2 transition-transform group-hover:scale-110" />
+                          <p className="text-white/70 text-sm font-medium">{img.category}</p>
+                        </div>
+                        {/* Overlay */}
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center">
+                          <div className="opacity-0 group-hover:opacity-100 transition-all">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm text-white">
+                              <ZoomIn className="h-6 w-6" />
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    )}
+                  </div>
+                  <div className="p-4 bg-white">
+                    <h3 className="text-base font-bold text-dark group-hover:text-primary transition-colors">{img.title}</h3>
+                    <p className="text-xs text-gray-400 mt-1">{img.desc}</p>
                   </div>
                 </div>
-                <div className="p-4 bg-white">
-                  <h3 className="text-base font-bold text-dark group-hover:text-primary transition-colors">{img.title}</h3>
-                  <p className="text-xs text-gray-400 mt-1">{img.desc}</p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -129,12 +140,25 @@ export function Gallery() {
             >
               <X className="h-5 w-5" />
             </button>
-            <div className={`h-72 md:h-96 bg-gradient-to-br ${selectedImage.gradient} flex items-center justify-center relative`}>
-              <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.2) 1px, transparent 1px)", backgroundSize: "15px 15px" }}></div>
-              <div className="relative text-center">
-                <selectedImage.icon className="mx-auto h-24 w-24 text-white/80 mb-3" />
-                <p className="text-white/70 text-lg font-medium">{selectedImage.category}</p>
-              </div>
+            <div className="h-72 md:h-96 relative">
+              {selectedImage.imageUrl ? (
+                <img
+                  src={selectedImage.imageUrl}
+                  alt={selectedImage.title}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className={`h-full bg-gradient-to-br ${selectedImage.gradient} flex items-center justify-center relative`}>
+                  <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.2) 1px, transparent 1px)", backgroundSize: "15px 15px" }}></div>
+                  <div className="relative text-center">
+                    {(() => {
+                      const IconComponent = iconMap[selectedImage.icon as keyof typeof iconMap] || Monitor;
+                      return <IconComponent className="mx-auto h-24 w-24 text-white/80 mb-3" />;
+                    })()}
+                    <p className="text-white/70 text-lg font-medium">{selectedImage.category}</p>
+                  </div>
+                </div>
+              )}
             </div>
             <div className="bg-white p-6">
               <h3 className="text-xl font-bold text-dark mb-2">{selectedImage.title}</h3>

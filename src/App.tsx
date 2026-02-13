@@ -11,30 +11,33 @@ import { ScrollToTop } from "./components/ScrollToTop";
 import { WhatsAppButton } from "./components/WhatsAppButton";
 import { CourseProvider } from "./context/CourseContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import { SiteProvider } from "./context/SiteContext";
 
 export function App() {
   return (
-    <CourseProvider>
-      <ThemeProvider>
-        <Router>
-          <ScrollToTop />
-          <div className="flex min-h-screen flex-col">
-            <Header />
-            <main className="flex-1">
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/courses" element={<Courses />} />
-                <Route path="/gallery" element={<Gallery />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/admin" element={<Admin />} />
-              </Routes>
-            </main>
-            <Footer />
-            <WhatsAppButton />
-          </div>
-        </Router>
-      </ThemeProvider>
-    </CourseProvider>
+    <SiteProvider>
+      <CourseProvider>
+        <ThemeProvider>
+          <Router>
+            <ScrollToTop />
+            <div className="flex min-h-screen flex-col">
+              <Header />
+              <main className="flex-1">
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/courses" element={<Courses />} />
+                  <Route path="/gallery" element={<Gallery />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/admin" element={<Admin />} />
+                </Routes>
+              </main>
+              <Footer />
+              <WhatsAppButton />
+            </div>
+          </Router>
+        </ThemeProvider>
+      </CourseProvider>
+    </SiteProvider>
   );
 }

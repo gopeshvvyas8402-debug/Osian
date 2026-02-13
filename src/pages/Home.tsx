@@ -3,10 +3,11 @@ import {
   Monitor, BookOpen, Award, Users, GraduationCap, Briefcase,
   Star, ChevronRight, ArrowRight, CheckCircle, Target, Lightbulb,
   TrendingUp, Clock, Shield, Zap, Code, PenTool, BarChart3,
-  Smartphone, Database, Globe
+  Smartphone, Database, Globe, Terminal, FileSpreadsheet, Layers, Heart, ThumbsUp
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import { useState, useEffect, useRef } from "react";
+import { useSiteContext } from "../context/SiteContext";
 
 function useCountUp(end: number, duration: number = 2000) {
   const [count, setCount] = useState(0);
@@ -37,40 +38,17 @@ function useCountUp(end: number, duration: number = 2000) {
   return { count, ref };
 }
 
-const stats = [
-  { icon: Users, label: "Happy Students", value: 5000, suffix: "+" },
-  { icon: BookOpen, label: "Courses Available", value: 25, suffix: "+" },
-  { icon: Award, label: "Years Experience", value: 10, suffix: "+" },
-  { icon: Briefcase, label: "Placed Students", value: 3000, suffix: "+" },
-];
-
-const courses = [
-  { icon: BarChart3, title: "Tally Prime with GST", desc: "Master accounting with Tally Prime, GST filing, inventory management, and financial reporting.", color: "from-blue-500 to-blue-700" },
-  { icon: Code, title: "Web Development", desc: "Learn HTML, CSS, JavaScript, React, and modern web technologies to build responsive websites.", color: "from-green-500 to-green-700" },
-  { icon: Monitor, title: "Computer Basics (CCC)", desc: "Course on Computer Concepts covering fundamental computing skills and internet usage.", color: "from-purple-500 to-purple-700" },
-  { icon: GraduationCap, title: "DCA / PGDCA", desc: "Diploma and Post Graduate Diploma in Computer Application with comprehensive curriculum.", color: "from-orange-500 to-orange-700" },
-  { icon: PenTool, title: "Graphic Design", desc: "Master Photoshop, Illustrator, CorelDRAW and create stunning visual designs professionally.", color: "from-pink-500 to-pink-700" },
-  { icon: Globe, title: "Digital Marketing", desc: "SEO, Social Media Marketing, Google Ads, Email Marketing and complete digital strategy.", color: "from-cyan-500 to-cyan-700" },
-];
-
-const features = [
-  { icon: Target, title: "Practical Training", desc: "Hands-on projects and real-world exercises for practical experience." },
-  { icon: Shield, title: "Certified Courses", desc: "Industry-recognized certifications to boost your career prospects." },
-  { icon: Clock, title: "Flexible Timings", desc: "Morning, afternoon, and evening batches to suit your schedule." },
-  { icon: Zap, title: "Expert Faculty", desc: "Experienced trainers with industry knowledge and teaching excellence." },
-  { icon: Lightbulb, title: "Modern Labs", desc: "State-of-the-art computer labs with latest hardware and software." },
-  { icon: TrendingUp, title: "Placement Support", desc: "Dedicated placement cell to help you land your dream job." },
-];
-
-const testimonials = [
-  { name: "Priya Patel", course: "Web Development", text: "The web development course at Osian Enterprise was amazing! I got placed immediately after completing the course. The practical training was excellent.", rating: 5 },
-  { name: "Rahul Sharma", course: "Tally with GST", text: "Best Tally training in Rajkot! The faculty explained every concept clearly and the hands-on practice helped me a lot in my job.", rating: 5 },
-  { name: "Anjali Mehta", course: "Graphic Design", text: "I learned Photoshop and CorelDRAW here and now I'm working as a freelance designer. Thank you Osian Enterprise!", rating: 5 },
-  { name: "Vivek Joshi", course: "PGDCA", text: "The PGDCA course covered everything from basics to advanced topics. Great institute with supportive teachers.", rating: 4 },
-];
+const iconMap = {
+  Monitor, BarChart3, GraduationCap, Code, Terminal,
+  PenTool, Globe, FileSpreadsheet, Smartphone, Database, Layers,
+  Users, BookOpen, Award, Briefcase, Target, Shield,
+  Clock, Zap, Lightbulb, TrendingUp, Heart, ThumbsUp
+};
 
 export function Home() {
   const { isDark } = useTheme();
+  const { content } = useSiteContext();
+
   return (
     <div>
       {/* Hero Section */}
@@ -86,29 +64,26 @@ export function Home() {
             <div className="animate-fadeInUp">
               <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm text-white backdrop-blur-sm">
                 <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                <span>#1 Computer Training Institute in Vadodara</span>
+                <span>{content.hero.badge}</span>
               </div>
               <h1 className="mb-6 text-4xl font-extrabold leading-tight text-white md:text-5xl lg:text-6xl">
-                Build Your
-                <span className="block gradient-text">IT Career</span>
-                With Confidence
+                {content.hero.title}
               </h1>
               <p className="mb-8 text-lg text-blue-100 md:text-xl max-w-lg">
-                Learn industry-ready computer skills from expert trainers.
-                Join Osian Enterprise for practical, job-oriented training in Tally, Web Development, DCA, PGDCA and more.
+                {content.hero.subtitle}
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link
                   to="/courses"
                   className="inline-flex items-center gap-2 rounded-xl bg-accent px-8 py-4 text-base font-bold text-white shadow-lg transition-all duration-300 hover:bg-accent/90 hover:shadow-xl hover:-translate-y-0.5"
                 >
-                  Explore Courses <ArrowRight className="h-5 w-5" />
+                  {content.hero.cta1} <ArrowRight className="h-5 w-5" />
                 </Link>
                 <Link
                   to="/contact"
                   className="inline-flex items-center gap-2 rounded-xl border-2 border-white/30 bg-white/10 px-8 py-4 text-base font-bold text-white backdrop-blur-sm transition-all duration-300 hover:bg-white hover:text-primary"
                 >
-                  Contact Us <ChevronRight className="h-5 w-5" />
+                  {content.hero.cta2} <ChevronRight className="h-5 w-5" />
                 </Link>
               </div>
             </div>
@@ -171,12 +146,13 @@ export function Home() {
       <section className="bg-white py-16">
         <div className="mx-auto max-w-7xl px-4">
           <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
-            {stats.map((stat, i) => {
+            {content.stats.map((stat, i) => {
+              const IconComponent = iconMap[stat.icon as keyof typeof iconMap] || Users;
               const { count, ref } = useCountUp(stat.value);
               return (
                 <div key={i} ref={ref} className="group rounded-2xl bg-gradient-to-br from-gray-50 to-blue-50 p-6 text-center shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border border-gray-100">
                   <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent text-white shadow-md transition-transform group-hover:scale-110">
-                    <stat.icon className="h-7 w-7" />
+                    <IconComponent className="h-7 w-7" />
                   </div>
                   <p className="text-3xl font-extrabold text-primary-dark md:text-4xl">{count}{stat.suffix}</p>
                   <p className="mt-1 text-sm font-medium text-gray-500">{stat.label}</p>
@@ -223,24 +199,18 @@ export function Home() {
             </div>
             <div>
               <span className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary mb-4">
-                About Us
+                {content.about.badge}
               </span>
               <h2 className="mb-5 text-3xl font-extrabold text-dark md:text-4xl">
-                Welcome to <span className="text-primary">Osian Enterprise</span>
+                {content.about.title}
               </h2>
-              <p className="mb-4 text-gray-600 leading-relaxed">
-                Osian Enterprise is a premier IT & Computer training institute dedicated to empowering students with cutting-edge technology skills. Established with a vision to bridge the gap between education and industry requirements, we provide comprehensive computer training programs.
-              </p>
-              <p className="mb-6 text-gray-600 leading-relaxed">
-                Our expert faculty, modern infrastructure, and practical-oriented approach make us the preferred choice for students seeking quality computer education in Vadodara.
-              </p>
+              {content.about.description.map((paragraph, i) => (
+                <p key={i} className="mb-4 text-gray-600 leading-relaxed">
+                  {paragraph}
+                </p>
+              ))}
               <div className="mb-8 space-y-3">
-                {[
-                  "Industry-Oriented Curriculum",
-                  "Experienced & Certified Trainers",
-                  "100% Placement Assistance",
-                  "Flexible Batch Timings",
-                ].map((item, i) => (
+                {content.about.features.map((item, i) => (
                   <div key={i} className="flex items-center gap-3">
                     <CheckCircle className="h-5 w-5 text-green-500 shrink-0" />
                     <span className="text-sm font-medium text-gray-700">{item}</span>
@@ -273,18 +243,21 @@ export function Home() {
             </p>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {courses.map((course, i) => (
-              <div key={i} className="group rounded-2xl border border-gray-100 bg-white p-7 shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-2 hover:border-primary/20 card-hover">
-                <div className={`mb-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${course.color} text-white shadow-md transition-transform group-hover:scale-110`}>
-                  <course.icon className="h-7 w-7" />
+            {content.courses.map((course, i) => {
+              const IconComponent = iconMap[course.icon as keyof typeof iconMap] || Monitor;
+              return (
+                <div key={i} className="group rounded-2xl border border-gray-100 bg-white p-7 shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-2 hover:border-primary/20 card-hover">
+                  <div className={`mb-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${course.color} text-white shadow-md transition-transform group-hover:scale-110`}>
+                    <IconComponent className="h-7 w-7" />
+                  </div>
+                  <h3 className="mb-3 text-xl font-bold text-dark group-hover:text-primary transition-colors">{course.title}</h3>
+                  <p className="mb-5 text-sm text-gray-500 leading-relaxed">{course.desc}</p>
+                  <Link to="/courses" className="inline-flex items-center gap-1 text-sm font-semibold text-primary transition-all hover:gap-2">
+                    Learn More <ArrowRight className="h-4 w-4" />
+                  </Link>
                 </div>
-                <h3 className="mb-3 text-xl font-bold text-dark group-hover:text-primary transition-colors">{course.title}</h3>
-                <p className="mb-5 text-sm text-gray-500 leading-relaxed">{course.desc}</p>
-                <Link to="/courses" className="inline-flex items-center gap-1 text-sm font-semibold text-primary transition-all hover:gap-2">
-                  Learn More <ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
-            ))}
+              );
+            })}
           </div>
           <div className="mt-12 text-center">
             <Link
@@ -313,15 +286,18 @@ export function Home() {
             </p>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature, i) => (
-              <div key={i} className="group rounded-2xl bg-white/10 p-7 backdrop-blur-sm border border-white/10 transition-all duration-300 hover:bg-white/20 hover:-translate-y-1">
-                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-secondary text-white shadow-md">
-                  <feature.icon className="h-6 w-6" />
+            {content.features.map((feature, i) => {
+              const IconComponent = iconMap[feature.icon as keyof typeof iconMap] || Target;
+              return (
+                <div key={i} className="group rounded-2xl bg-white/10 p-7 backdrop-blur-sm border border-white/10 transition-all duration-300 hover:bg-white/20 hover:-translate-y-1">
+                  <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-secondary text-white shadow-md">
+                    <IconComponent className="h-6 w-6" />
+                  </div>
+                  <h3 className="mb-2 text-lg font-bold text-white">{feature.title}</h3>
+                  <p className="text-sm text-blue-100 leading-relaxed">{feature.desc}</p>
                 </div>
-                <h3 className="mb-2 text-lg font-bold text-white">{feature.title}</h3>
-                <p className="text-sm text-blue-100 leading-relaxed">{feature.desc}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -341,7 +317,7 @@ export function Home() {
             </p>
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {testimonials.map((t, i) => (
+            {content.testimonials.map((t, i) => (
               <div key={i} className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                 <div className="mb-4 flex gap-1">
                   {Array.from({ length: 5 }).map((_, j) => (
@@ -374,24 +350,23 @@ export function Home() {
             </div>
             <div className="relative">
               <h2 className="mb-4 text-3xl font-extrabold md:text-4xl">
-                Ready to Start Your <span className="text-secondary">IT Career?</span>
+                {content.cta.title}
               </h2>
               <p className="mb-8 text-lg text-blue-100 max-w-xl mx-auto">
-                Join Osian Enterprise today and take the first step towards a successful career in IT.
-                Admissions are now open!
+                {content.cta.subtitle}
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <Link
                   to="/contact"
                   className="inline-flex items-center gap-2 rounded-xl bg-accent px-8 py-4 text-base font-bold text-white shadow-lg transition-all hover:bg-accent/90 hover:shadow-xl hover:-translate-y-0.5"
                 >
-                  Enroll Now <ArrowRight className="h-5 w-5" />
+                  {content.cta.cta1} <ArrowRight className="h-5 w-5" />
                 </Link>
                 <a
-                  href="tel:+919876543210"
+                  href={`tel:${content.contactInfo.phone}`}
                   className="inline-flex items-center gap-2 rounded-xl border-2 border-white/30 bg-white/10 px-8 py-4 text-base font-bold text-white backdrop-blur-sm transition-all hover:bg-white hover:text-primary"
                 >
-                  Call Us Now
+                  {content.cta.cta2}
                 </a>
               </div>
             </div>
